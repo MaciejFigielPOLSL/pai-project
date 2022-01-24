@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -9,24 +10,13 @@ import (
 	"time"
 )
 
-const OK = 0
-const ID_TAKEN = 2
-
 type Entry struct {
 	gorm.Model
 	EntryId  uint
 	AuthorId string
+	Title    string
 	Text     string
-}
-
-type User struct {
-	gorm.Model
-	UserId     string
-	Password   string
-	Name       string
-	Email      string
-	ShowName   bool
-	JoinedDate string
+	AddDate  time.Time
 }
 
 type Comment struct {
@@ -34,14 +24,24 @@ type Comment struct {
 	EntryId  uint
 	AuthorId string
 	Text     string
-	Likes    int
-	Dislikes int
+	Likes    int32
+	Dislikes int32
+}
+
+type User struct {
+	gorm.Model
+	Username   string
+	Password   string
+	Name       string
+	Email      string
+	ShowName   bool
+	JoinedDate string
 }
 
 var db *gorm.DB
 
 func InitDB() {
-	ClearDatabase()
+	//ClearDatabase()
 	var err error
 	db, err = gorm.Open(sqlite.Open("web.db"), &gorm.Config{})
 	if err != nil {
@@ -78,18 +78,24 @@ func ClearDatabase() {
 	}
 }
 
-func ValidateUser(userId string) bool {
+func GetUser(userId string) User {
 	var user User
-	res := db.Where(User{UserId: userId}).First(&user)
-	if res.RowsAffected != 0 {
-		return false
+	if !UserExists(userId) {
+		return user
 	}
-	return true
+	db.Where(User{Username: userId}).First(&user)
+	return user
+}
+
+func UserExists(userId string) bool {
+	var user User
+	res := db.Where(User{Username: userId}).First(&user)
+	return !errors.Is(res.Error, gorm.ErrRecordNotFound)
 }
 
 func RegisterUser(userId, password, email string) {
 	res := db.Create(&User{
-		UserId:     userId,
+		Username:   userId,
 		Name:       "",
 		Email:      email,
 		Password:   password,
@@ -105,12 +111,12 @@ func RegisterUser(userId, password, email string) {
 }
 
 func AuthenticateUser(userId, password string) bool {
-	if !ValidateUser(userId) {
+	if UserExists(userId) {
 		return false
 	}
 
 	var user User
-	res := db.Where(User{UserId: userId, Password: password}).First(&user)
+	res := db.Where(User{Username: userId, Password: password}).First(&user)
 	if res.RowsAffected != 0 {
 		return false
 	}
@@ -132,14 +138,83 @@ func ModifyUser(name, password, email string, showName bool) {
 	db.Save(&user)
 }
 
+var entriesPerPage = 10
+
+func GetAllEntries() []Entry {
+	var entries []Entry
+	db.Order("add_date").Find(&entries)
+	return entries
+}
+
+func GetEntriesOnPage(page int) []Entry {
+	var entries []Entry
+	result := db.Order("add_date").Offset(page * entriesPerPage).Limit(entriesPerPage).Find(&entries)
+
+	if result.Error != nil {
+
+	}
+	return entries
+}
+
+func AddEntry(username string, title, text string) {
+	entry := Entry{
+		AuthorId: username,
+		Title:    title,
+		Text:     text,
+		AddDate:  time.Now(),
+	}
+	db.Create(&entry)
+}
+
+func AddComment(entryId uint, authorId, text string) {
+	comment := Comment{
+		EntryId:  entryId,
+		AuthorId: authorId,
+		Text:     text,
+		Likes:    0,
+		Dislikes: 0,
+	}
+	db.Create(&comment)
+}
+
+func AddLike(commentId int32) {
+	var comment Comment
+	db.First(&comment, commentId)
+	comment.Likes++
+	db.Save(&comment)
+}
+
+func AddDislike(commentId int32) {
+	var comment Comment
+	db.First(&comment, commentId)
+	comment.Dislikes++
+	db.Save(&comment)
+}
+
+func GetFullEntry(id string) (Entry, []Comment) {
+	return GetEntry(id), GetEntryComments(id)
+}
+
 func GetEntry(id string) Entry {
 	var entry Entry
-	db.First(&entry, "id = ?", id) // find product with code D42
+	db.First(&entry, "id = ?", id)
 	return entry
+}
+
+func GetEntryComments(entryId string) []Comment {
+	var comments []Comment
+	db.Find(&comments, "entry_id = ?", entryId)
+	return comments
 }
 
 func GetEntriesForAuthor(authorId string) []Entry {
 	var entries []Entry
-	db.Where("authorId LIKE ?", authorId).Find(&entries)
+	db.Where("author_id LIKE ?", authorId).Find(&entries)
 	return entries
+}
+
+func GetAllComments() []Comment {
+	var comments []Comment
+	db.Find(&comments)
+	return comments
 }
