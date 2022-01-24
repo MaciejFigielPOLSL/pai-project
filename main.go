@@ -1,8 +1,11 @@
 package main
 
-import "sources/data"
+import (
+	"sources/data"
+	"sources/server"
+)
 
 func main() {
 	data.InitDB()
-	data.StartServer()
+	server.Run()
 }
