@@ -14,7 +14,7 @@ func registerUser(c *gin.Context) {
 	email := c.Request.FormValue("email")
 	passwd := c.Request.FormValue("password")
 
-	fmt.Printf("Trying to register user: %s, %s, %s", username, email, passwd)
+	fmt.Printf("Trying to register user: %s, %s, %s\n", username, email, passwd)
 
 	var RegisterState = make(map[string]interface{})
 
@@ -99,4 +99,10 @@ func modifyUser(c *gin.Context) {
 
 	data.ModifyUser(name, password, email, showName)
 	c.String(http.StatusOK, "")
+}
+
+func deleteUser(c *gin.Context) {
+	session := sessions.Default(c)
+	username := session.Get(userkey).(string)
+	data.DeleteUser(username)
 }

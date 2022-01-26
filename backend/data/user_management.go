@@ -66,3 +66,7 @@ func ModifyUser(name, password, email string, showName bool) {
 	user.ShowName = showName
 	db.Save(&user)
 }
+
+func DeleteUser(userId string) {
+	db.Delete(&User{}, userId)
+}

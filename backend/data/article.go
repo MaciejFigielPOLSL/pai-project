@@ -1,6 +1,9 @@
 package data
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 var entriesPerPage = 10
 
@@ -41,14 +44,14 @@ func AddComment(entryId uint, authorId, text string) {
 	db.Create(&comment)
 }
 
-func AddLike(commentId int32) {
+func AddLike(commentId int) {
 	var comment Comment
 	db.First(&comment, commentId)
 	comment.Likes++
 	db.Save(&comment)
 }
 
-func AddDislike(commentId int32) {
+func AddDislike(commentId int) {
 	var comment Comment
 	db.First(&comment, commentId)
 	comment.Dislikes++
@@ -81,4 +84,12 @@ func GetAllComments() []Comment {
 	var comments []Comment
 	db.Find(&comments)
 	return comments
+}
+
+func DeleteComments() {
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Comment{})
+}
+
+func DeleteArticles() {
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Article{})
 }

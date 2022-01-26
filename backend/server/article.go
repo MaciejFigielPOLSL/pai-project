@@ -85,3 +85,21 @@ func addComment(c *gin.Context) {
 func getComments(c *gin.Context) {
 	c.JSON(http.StatusOK, data.GetAllComments())
 }
+
+func addLike(c *gin.Context) {
+	param := c.Param("commentId")
+	commentId, err := strconv.Atoi(param)
+	if err != nil {
+		fmt.Printf("Invalid commentId %s, cannot cast to int\n", param)
+	}
+	data.AddLike(commentId)
+}
+
+func addDislike(c *gin.Context) {
+	param := c.Param("commentId")
+	commentId, err := strconv.Atoi(param)
+	if err != nil {
+		fmt.Printf("Invalid commentId %s, cannot cast to int\n", param)
+	}
+	data.AddDislike(commentId)
+}

@@ -22,8 +22,8 @@ type Comment struct {
 	EntryId  uint
 	AuthorId string
 	Text     string
-	Likes    int32
-	Dislikes int32
+	Likes    int
+	Dislikes int
 }
 
 type User struct {
