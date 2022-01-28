@@ -84,6 +84,16 @@ func status(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "You are logged in"})
 }
 
+func isLoggedIn(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(userkey)
+	if user == nil {
+		c.JSON(http.StatusOK, gin.H{"logged": false})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"logged": true})
+}
+
 func modifyUser(c *gin.Context) {
 	username := c.PostForm("username")
 	name := c.PostForm("name")

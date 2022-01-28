@@ -41,6 +41,7 @@ func engine() *gin.Engine {
 	r.POST("/api/login", login)
 	r.POST("/api/logout", authRequired, logout)
 	r.POST("/api/modify", authRequired, modifyUser)
+	r.GET("/api/status", isLoggedIn)
 	r.POST("/api/clear", authRequired, clearAllArticles)
 
 	r.GET("/articles/page/:page", getArticlesForPage)

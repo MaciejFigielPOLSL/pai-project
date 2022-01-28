@@ -1,6 +1,12 @@
 cd frontend
 npm run build
-rm -rf backend\index\dist
-cp frontend\dist backend\index\
+cd ..
+rm -rf ./backend/index/dist
+cp -r ./frontend/dist ./backend/index/
 cd backend
-go build
+rm ./build/server
+go build -o ./build/server sources
+cp ./build/server ../app/
+cp ./index ../app/index
+cd ..
+

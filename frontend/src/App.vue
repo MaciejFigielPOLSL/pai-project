@@ -40,10 +40,9 @@ export default {
     },
     isLoggedIn() {
       axios
-          .get('http://localhost:8080/api/private/status', {withCredentials: true})
+          .get('http://localhost:8080/api/status', {withCredentials: true})
           .then(response => {
-            console.log(response);
-            if (response.status == 200) {
+            if (response.data.logged) {
               Vue.prototype.$mySession.loggedIn = true;
             } else {
               Vue.prototype.$mySession.loggedIn = false;
@@ -51,7 +50,7 @@ export default {
             this.loggedIn = Vue.prototype.$mySession.loggedIn;
           })
           // eslint-disable-next-line no-unused-vars
-          .catch(err => {});
+          .catch(err => console.log(err));
     },
   }
 }
