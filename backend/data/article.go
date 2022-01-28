@@ -5,11 +5,30 @@ import (
 	"time"
 )
 
+type Article struct {
+	gorm.Model
+	EntryId    uint
+	AuthorId   string
+	AuthorName string
+	Title      string
+	Text       string
+	AddDate    time.Time
+}
+
+type Comment struct {
+	gorm.Model
+	EntryId    uint
+	AuthorName string
+	Text       string
+	Likes      int
+	Dislikes   int
+}
+
 var entriesPerPage = 10
 
 func GetAllArticles() []Article {
 	var articles []Article
-	db.Order("add_date").Find(&articles)
+	db.Order("add_date desc").Find(&articles)
 	return articles
 }
 
@@ -24,22 +43,24 @@ func GetArticlesPerPage(page int) []Article {
 }
 
 func AddArticle(username string, title, text string) {
+	user := GetUser(username)
 	entry := Article{
-		AuthorId: username,
-		Title:    title,
-		Text:     text,
-		AddDate:  time.Now(),
+		AuthorId:   username,
+		AuthorName: user.Name,
+		Title:      title,
+		Text:       text,
+		AddDate:    time.Now(),
 	}
 	db.Create(&entry)
 }
 
-func AddComment(entryId uint, authorId, text string) {
+func AddComment(entryId uint, authorName, text string) {
 	comment := Comment{
-		EntryId:  entryId,
-		AuthorId: authorId,
-		Text:     text,
-		Likes:    0,
-		Dislikes: 0,
+		EntryId:    entryId,
+		AuthorName: authorName,
+		Text:       text,
+		Likes:      0,
+		Dislikes:   0,
 	}
 	db.Create(&comment)
 }
@@ -82,7 +103,7 @@ func GetArticlesForAuthor(authorId string) []Article {
 
 func GetAllComments() []Comment {
 	var comments []Comment
-	db.Find(&comments)
+	db.Order("created_at desc").Find(&comments)
 	return comments
 }
 

@@ -5,36 +5,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
-	"time"
 )
-
-type Article struct {
-	gorm.Model
-	EntryId  uint
-	AuthorId string
-	Title    string
-	Text     string
-	AddDate  time.Time
-}
-
-type Comment struct {
-	gorm.Model
-	EntryId  uint
-	AuthorId string
-	Text     string
-	Likes    int
-	Dislikes int
-}
-
-type User struct {
-	gorm.Model
-	Username   string
-	Password   string
-	Name       string
-	Email      string
-	ShowName   bool
-	JoinedDate string
-}
 
 var db *gorm.DB
 

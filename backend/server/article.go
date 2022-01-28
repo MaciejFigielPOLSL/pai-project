@@ -15,19 +15,28 @@ type EntryJsonBody struct {
 }
 
 type CommentJsonBody struct {
-	EntryId uint   `form:"entryId" json:"entryId"`
-	Text    string `form:"text" json:"text"`
+	ArticleId  uint   `form:"articleId" json:"articleId"`
+	AuthorName string `form:"authorName" json:"authorName"`
+	Text       string `form:"text" json:"text"`
+}
+
+type FullEntryResponse struct {
+	Article  data.Article   `json:"article"`
+	Comments []data.Comment `json:"comments"`
 }
 
 func getAllArticles(c *gin.Context) {
-	entries := data.GetAllArticles()
-	c.JSON(http.StatusOK, entries)
+	articles := data.GetAllArticles()
+	fmt.Printf("Get all articles list %d\n", len(articles))
+	c.JSON(http.StatusOK, articles)
 }
 
 func getFullArticleData(c *gin.Context) {
-	entryId := c.Param("entryId")
-	entry, comments := data.GetFullArticleData(entryId)
-	c.JSON(http.StatusOK, fullEntry{Entry: entry, Comments: comments})
+	articleId := c.Param("articleId")
+	article, comments := data.GetFullArticleData(articleId)
+
+	fmt.Printf("Get full article data %s\n", article)
+	c.JSON(http.StatusOK, FullEntryResponse{Article: article, Comments: comments})
 }
 
 func getArticlesForPage(c *gin.Context) {
@@ -43,6 +52,8 @@ func getArticlesForPage(c *gin.Context) {
 		return
 	}
 	entries := data.GetArticlesPerPage(page - 1)
+
+	fmt.Printf("Get articles for page %d\n", page)
 	c.JSON(http.StatusOK, entries)
 }
 
@@ -56,19 +67,19 @@ func addArticle(c *gin.Context) {
 		fmt.Printf("%s\n", err)
 	}
 
-	fmt.Println(requestBody.Text)
-
+	fmt.Printf("Add article %s by user %s\n", requestBody.Title, username)
 	data.AddArticle(username, requestBody.Title, requestBody.Text)
 }
 
 func getArticleComments(c *gin.Context) {
-	//entryId, _ := strconv.ParseUint(c.Param("entryId"), 10, 32)
-	entryId := c.Param("entryId")
-	c.JSON(http.StatusOK, data.GetArticleComments(entryId))
+	//articleId, _ := strconv.ParseUint(c.Param("articleId"), 10, 32)
+	articleId := c.Param("articleId")
+	fmt.Printf("Get article '%s' comments\n", articleId)
+	c.JSON(http.StatusOK, data.GetArticleComments(articleId))
 }
 
 func addComment(c *gin.Context) {
-	username := sessions.Default(c).Get(userkey).(string)
+	//username := sessions.Default(c).Get(userkey).(string)
 	//user := GetUser(username)
 	var requestBody CommentJsonBody
 
@@ -77,13 +88,15 @@ func addComment(c *gin.Context) {
 		fmt.Printf("%s\n", err)
 	}
 
-	fmt.Printf("%d: %s, %s\n", requestBody.EntryId, username, requestBody.Text)
+	fmt.Printf("%d: %s, %s\n", requestBody.ArticleId, requestBody.AuthorName, requestBody.Text)
 
-	data.AddComment(requestBody.EntryId, username, requestBody.Text)
+	data.AddComment(requestBody.ArticleId, requestBody.AuthorName, requestBody.Text)
 }
 
 func getComments(c *gin.Context) {
-	c.JSON(http.StatusOK, data.GetAllComments())
+	comments := data.GetAllComments()
+	fmt.Printf("Get all comments\n", comments)
+	c.JSON(http.StatusOK, comments)
 }
 
 func addLike(c *gin.Context) {
@@ -92,6 +105,8 @@ func addLike(c *gin.Context) {
 	if err != nil {
 		fmt.Printf("Invalid commentId %s, cannot cast to int\n", param)
 	}
+
+	fmt.Printf("Add like to comment %s\n", commentId)
 	data.AddLike(commentId)
 }
 
@@ -101,5 +116,7 @@ func addDislike(c *gin.Context) {
 	if err != nil {
 		fmt.Printf("Invalid commentId %s, cannot cast to int\n", param)
 	}
+
+	fmt.Printf("Add dislike to comment %s\n", commentId)
 	data.AddDislike(commentId)
 }

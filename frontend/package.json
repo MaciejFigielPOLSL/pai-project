@@ -8,9 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.25.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
-    "vue-fullpage": "^2.0.5"
+    "vue-fullpage": "^2.0.5",
+    "vue-router": "^3.5.3",
+    "vue-session": "^1.0.0"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.12.3",

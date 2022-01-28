@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+type User struct {
+	gorm.Model
+	Username   string
+	Password   string
+	Name       string
+	Email      string
+	ShowName   bool
+	JoinedDate string
+}
+
 func GetUser(userId string) User {
 	var user User
 	if !UserExists(userId) {

@@ -1,10 +1,11 @@
 <template>
   <div class="container shadow p-3 mb-5 bg-gradient">
-    <div class="d-flex justify-content-center">
-      <div class="row">
-        ARTICLES LIST
-      </div>
+
+    <div class="container-fluid" v-show="loggedUser.loggedIn">
+      <router-link :to="{name: 'add'}" tag="button" class="btn btn-secondary btn-sm">DODAJ ARTYKUŁ</router-link>
     </div>
+
+    <article-entry v-for="article in articles" :key="article.ID" :data="article" d="article"></article-entry>
     <br>
     <br>
 
@@ -31,10 +32,28 @@
 </template>
 
 <script>
+import axios from "axios";
+import ArticleEntry from "@/components/ArticleEntry";
+
 export default {
   name: "Articles",
+  props: [
+    'loggedUser'
+  ],
+  components: {
+    ArticleEntry
+  },
 
-  data: function () {
+  data () {
+    return {
+      articles: null
+    }
+  },
+
+  mounted () {
+    axios
+        .get('http://localhost:8080/articles/')
+        .then(response => this.articles = response.data)
   }
 }
 </script>

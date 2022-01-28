@@ -1,18 +1,26 @@
 <template>
   <div class="container">
     <div class="row sized">
-      <articles></articles>
+      <router-view :loggedUser="loggedUser"></router-view>
+<!--      <router-view name="main"></router-view>-->
+<!--      <router-view name="articles"></router-view>-->
+
+<!--      <articles></articles>-->
     </div>
   </div>
 </template>
 
 <script>
-import Articles from "./Articles";
+// import Articles from "./Articles";
 
 export default {
   name: "MainPlace",
+  props: [
+    'loggedIn',
+    'loggedUser'
+  ],
   components: {
-    Articles,
+    // Articles,
   }
 }
 </script>

@@ -97,6 +97,8 @@ func modifyUser(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("Modifying user %s data\n", username)
+
 	data.ModifyUser(name, password, email, showName)
 	c.String(http.StatusOK, "")
 }
@@ -104,5 +106,7 @@ func modifyUser(c *gin.Context) {
 func deleteUser(c *gin.Context) {
 	session := sessions.Default(c)
 	username := session.Get(userkey).(string)
+
+	fmt.Printf("Deleting user %s data\n", username)
 	data.DeleteUser(username)
 }
