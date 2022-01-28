@@ -1,0 +1,348 @@
+definitions:
+  server.ArticleJsonBody:
+    properties:
+      text:
+        type: string
+      title:
+        type: string
+    type: object
+  server.ArticleResponse:
+    properties:
+      AddDate:
+        type: string
+      AuthorId:
+        type: string
+      AuthorName:
+        type: string
+      ID:
+        type: integer
+      Text:
+        type: string
+      Title:
+        type: string
+    type: object
+  server.CommentJsonBody:
+    properties:
+      articleId:
+        type: integer
+      authorName:
+        type: string
+      text:
+        type: string
+    type: object
+  server.CommentResponse:
+    properties:
+      ArticleId:
+        type: integer
+      AuthorName:
+        type: string
+      Dislikes:
+        type: integer
+      ID:
+        type: integer
+      Likes:
+        type: integer
+      Text:
+        type: string
+    type: object
+  server.FullEntryResponseSwagger:
+    properties:
+      article:
+        $ref: '#/definitions/server.ArticleResponse'
+      comments:
+        items:
+          $ref: '#/definitions/server.CommentResponse'
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /api/clear:
+    get:
+      description: Clear all database
+      responses:
+        "200":
+          description: ""
+      summary: Clear all database
+      tags:
+      - debug
+  /api/login:
+    post:
+      description: Allows user to log into the system
+      parameters:
+      - description: User login
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: User password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login
+      tags:
+      - user
+  /api/logout:
+    post:
+      description: Allows user to log out from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Logout
+      tags:
+      - user
+  /api/private/deleteme:
+    post:
+      description: Removes user from system
+      responses: {}
+      summary: Delete user
+      tags:
+      - user
+  /api/private/me:
+    post:
+      description: Allows user to modify its data
+      parameters:
+      - description: User login
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: User name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: User password
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: User email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Show name or not
+        in: formData
+        name: showName
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Modify user
+      tags:
+      - user
+  /api/register:
+    post:
+      description: Add new user to system
+      parameters:
+      - description: User login
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: Email address
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: User password
+        in: formData
+        name: password
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Not Acceptable
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register new user
+      tags:
+      - user
+  /articles/:
+    get:
+      description: Returns all articles in system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.ArticleResponse'
+      summary: Returns all articles in system
+      tags:
+      - articles
+    post:
+      description: Allows to add article to system
+      parameters:
+      - description: Article to add
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/server.ArticleJsonBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      summary: Add article
+      tags:
+      - articles
+  /articles/:articleId:
+    get:
+      description: Returns full article data with array of its comments
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.FullEntryResponseSwagger'
+      summary: Returns article with comments
+      tags:
+      - articles
+  /articles/page/:page:
+    get:
+      description: Returns articles with pagination
+      parameters:
+      - description: Page to display
+        in: path
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.ArticleResponse'
+      summary: Returns articles with pagination
+      tags:
+      - articles
+  /comment:
+    get:
+      description: Get call comments in system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.CommentResponse'
+      summary: Get comments
+      tags:
+      - articles
+    post:
+      description: Add comment for article
+      parameters:
+      - description: Comment
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/server.CommentJsonBody'
+      responses:
+        "200":
+          description: ""
+      summary: Add comment
+      tags:
+      - articles
+  /comment/get/:articleId:
+    get:
+      description: Returns all comments for article
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.CommentResponse'
+      summary: Returns article comments
+      tags:
+      - articles
+  /comment/like/:commentId:
+    get:
+      description: Add dislike to comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      responses: {}
+      summary: Add dislike
+      tags:
+      - articles
+swagger: "2.0"

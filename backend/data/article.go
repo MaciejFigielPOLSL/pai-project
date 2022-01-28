@@ -7,7 +7,7 @@ import (
 
 type Article struct {
 	gorm.Model
-	EntryId    uint
+	ArticleId  uint
 	AuthorId   string
 	AuthorName string
 	Title      string
@@ -17,7 +17,7 @@ type Article struct {
 
 type Comment struct {
 	gorm.Model
-	EntryId    uint
+	ArticleId  uint
 	AuthorName string
 	Text       string
 	Likes      int
@@ -43,10 +43,9 @@ func GetArticlesPerPage(page int) []Article {
 }
 
 func AddArticle(username string, title, text string) {
-	user := GetUser(username)
 	entry := Article{
 		AuthorId:   username,
-		AuthorName: user.Name,
+		AuthorName: username,
 		Title:      title,
 		Text:       text,
 		AddDate:    time.Now(),
@@ -56,7 +55,7 @@ func AddArticle(username string, title, text string) {
 
 func AddComment(entryId uint, authorName, text string) {
 	comment := Comment{
-		EntryId:    entryId,
+		ArticleId:  entryId,
 		AuthorName: authorName,
 		Text:       text,
 		Likes:      0,

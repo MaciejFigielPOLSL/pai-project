@@ -50,7 +50,7 @@ export default {
             this.loggedIn = Vue.prototype.$mySession.loggedIn;
           })
           // eslint-disable-next-line no-unused-vars
-          .catch(err => console.log(err));
+          .catch(err => {});
     },
   }
 }

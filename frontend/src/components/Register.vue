@@ -37,8 +37,8 @@ export default {
       bodyFormData.append("password", this.password);
       axios
           .post('http://localhost:8080/api/register', bodyFormData, {withCredentials: true})
-          .then(response => {
-                console.log(response)
+          // eslint-disable-next-line no-unused-vars
+          .then(_ => {
                 this.$router.push("/");
                 EventBus.$emit('refresh');
               }

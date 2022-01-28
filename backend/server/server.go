@@ -5,9 +5,12 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"net/http"
 	"sources/data"
+	"sources/docs"
 )
 
 const (
@@ -35,8 +38,10 @@ func engine() *gin.Engine {
 	//}))
 	r.Use(CORSMiddleware())
 
+	docs.SwaggerInfo.BasePath = "/"
 	r.Use(static.Serve("/", static.LocalFile("./index/dist", true)))
 
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	r.POST("/api/register", registerUser)
 	r.POST("/api/login", login)
 	r.POST("/api/logout", authRequired, logout)
@@ -96,6 +101,11 @@ func authRequired(c *gin.Context) {
 	c.Next()
 }
 
+// @Summary Clear all database
+// @Description Clear all database
+// @Tags debug
+// @Success 200
+// @Router /api/clear [get]
 func clearAllArticles(c *gin.Context) {
 	data.DeleteComments()
 	data.DeleteArticles()
