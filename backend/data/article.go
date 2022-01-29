@@ -90,7 +90,7 @@ func GetArticle(id string) Article {
 
 func GetArticleComments(entryId string) []Comment {
 	var comments []Comment
-	db.Find(&comments, "entry_id = ?", entryId)
+	db.Find(&comments, "id = ?", entryId)
 	return comments
 }
 
